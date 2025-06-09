@@ -9,7 +9,3 @@ from langchain_pinecone import PineconeVectorStore
 
 load_dotenv()
 
-OPENAI_LLM_MODEL = 'gpt-4o-mini'
-OPENAI_EMBEDDING_MODEL = 'texte-emdedding-3-small'
-PINECONE_API_KEY = ''
-PINECONE_INDEX_NAME = ''
