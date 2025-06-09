@@ -17,10 +17,10 @@ vector_store = PineconeVectorStore(
 )
 
 # 이미지에서 정보추출
-def describe_dish_flavor(image_bytes, query):
-    data_url = f'data: image/jpeg;base64, {image_bytes}'
+def describe_dish_flavor(image_bytes,query):
+    data_url = f'data:image/jpeg;base64,{image_bytes}'
     messages = [
-        {'role':'system', 'content':'''
+        {'role':'system','content':'''
             Persona:
             As a flavor analysis system, I am equipped with a deep understanding of food ingredients, cooking methods, and sensory properties such as taste, texture, and aroma. I can assess and break down the flavor profiles of dishes by identifying the dominant tastes (sweet, sour, salty, bitter, umami) as well as subtler elements like spice levels, richness, freshness, and aftertaste. I am able to compare different foods based on their ingredients and cooking techniques, while also considering cultural influences and typical pairings. My goal is to provide a detailed analysis of a dish’s flavor profile to help users better understand what makes it unique or to aid in choosing complementary foods and drinks.
 
@@ -48,34 +48,29 @@ def describe_dish_flavor(image_bytes, query):
 
             - Food Pairing Example:
             For a rich chocolate cake, I would recommend a sweet dessert wine like Port to complement the bitterness of the chocolate, or a light espresso to contrast the sweetness and enhance the richness of the dessert.
-        
-        '''}, 
-
-        {'role':'user', 'content':[
-            {'type':'text', 'text':query},
-            {'type':'image_url', 'image_url':{'url':data_url}}
-        ]}
+         '''},
+         {'role':'user','content':[
+             {'type':'text','text':query},             
+             {'type':'image_url','image_url':{'url':data_url}}
+         ]}
     ]
     return llm.invoke(messages).content
 
-
 # 벡터DB에서 검색
 def search_wine(dish_flavor):
-    results_with_scores = vector_store.similarity_search_with_score(
+    results_with_scores =  vector_store.similarity_search_with_score(
         dish_flavor,
-        k = 2
+        k=2
     )
-
-    # 결과를 유사도와 함께 저장
+    # 결과를 유사도 함께 출력
     wine_reviews = []
-    for doc, score in results_with_scores:
-        review_text = f'유사도: {score:.4f}\n내용: {doc.page_content}'
+    for doc,score in  results_with_scores:
+        review_text = f'유사도:{score:.4f}\n내용:{doc.page_content}'
         wine_reviews.append(review_text)
     return {
-        'dish_flavor' : dish_flavor,
+        'dish_flavor' :dish_flavor,
         'wine_reviews' : '\n\n' .join(wine_reviews)
     }
-
 
 # 추천사유를 llm으로 생성
 def recommand_wine(inputs):
